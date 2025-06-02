@@ -1,0 +1,28 @@
+{
+  "name": "lettergonogo",
+  "version": "1.0.0",
+  "scripts": {
+    "serve": "concurrently \"rollup -c --watch --configServe\" \"tsc --watch\" --names rollup,typescript --prefix-colors auto,red",
+    "build": "npm run clean && tsc --noEmit --emitDeclarationOnly false && rollup -c --configProd",
+    "build:no-hash": "npm run clean && tsc --noEmit --emitDeclarationOnly false && rollup -c --configProd --configNoHash",
+    "clean": "rimraf build dist .rollup.cache tsconfig.tsbuildinfo"
+  },
+  "private": true,
+  "dependencies": {
+    "@m2c2kit/core": "0.3.30",
+    "@m2c2kit/addons": "0.3.29",
+    "@m2c2kit/session": "0.3.12"
+  },
+  "devDependencies": {
+    "@m2c2kit/build-helpers": "0.3.26",
+    "@rollup/plugin-node-resolve": "16.0.1",
+    "concurrently": "9.1.2",
+    "esbuild": "0.25.4",
+    "rimraf": "6.0.1",
+    "rollup": "4.41.0",
+    "rollup-plugin-esbuild": "6.2.1",
+    "rollup-plugin-livereload": "2.0.5",
+    "rollup-plugin-serve": "3.0.0",
+    "typescript": "5.8.3"
+  }
+}
