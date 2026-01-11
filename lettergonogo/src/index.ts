@@ -424,21 +424,22 @@ const session = new Session({
 });
 
 session.onActivityData((ev) => {
-  const trials = ev.data as unknown as any[]; 
+  const dataObj = ev.data as any;
+  const trials = dataObj.trials;
+  const config = ev.activityConfiguration as any;
+  const totalTrialsNeeded = config.number_of_trials;
 
-  if (trials && trials.length > 0) {
-    // 2. Count how many were correct
-    // We look for trials where selection_correct is explicitly true
-    const correctCount = trials.filter((t) => t.selection_correct === true).length;
-    
-    // 3. Calculate percentage (0 to 100)
+  if (trials && trials.length == totalTrialsNeeded) {
+    const correctCount = trials.filter((t: { selection_correct: boolean; }) => t.selection_correct === true).length;
     const accuracy = (correctCount / trials.length) * 100;
-    
-    // 4. Send ONLY the accuracy to Qualtrics
+
+    console.log("✅ DEBUG: Calculated Accuracy:", accuracy);
+
     if (window.parent) {
+      console.log("📤 DEBUG: Posting message to Qualtrics...");
       window.parent.postMessage({
-          type: "LETTERGONOGO_ACCURACY", // Custom message type for accuracy
-          value: accuracy.toFixed(2) // Send as string like "85.00"
+          type: "LETTERGONOGO_ACCURACY",
+          value: accuracy.toFixed(2)
       }, "*");
     }
   }
