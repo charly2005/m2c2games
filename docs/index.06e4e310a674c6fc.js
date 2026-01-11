@@ -1,5 +1,3 @@
-
-(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 var M2NodeType = /* @__PURE__ */ ((M2NodeType2) => {
   M2NodeType2["Node"] = "Node";
   M2NodeType2["Scene"] = "Scene";
@@ -9223,7 +9221,7 @@ class Game {
    * @param manifestJsonUrl - Do not use this parameter. Allow the default.
    * @returns a promise that resolves to the manifest object, or an empty object if there is no manifest
    */
-  async loadManifest(manifestJsonUrl = "__NO_M2C2KIT_MANIFEST_JSON_URL__") {
+  async loadManifest(manifestJsonUrl = "manifest.json") {
     if (manifestJsonUrl.includes("NO_M2C2KIT_MANIFEST_JSON_URL")) {
       return {};
     }
@@ -16470,6 +16468,12 @@ class LetterGoNoGo extends Game {
     okButton.onTapDown(() => {
       okButton.isUserInteractionEnabled = false;
       doneScene.removeAllChildren();
+      console.log("User clicked OK. Signaling Qualtrics...");
+      if (window.parent) {
+        window.parent.postMessage({
+          type: "LETTERGONOGO_COMPLETE"
+        }, "*");
+      }
       game.end();
     });
     doneScene.addChild(okButton);
@@ -16487,22 +16491,19 @@ const session = new Session({
   activities
 });
 session.onActivityData((ev) => {
-  if (ev.target.type === ActivityType.Game) {
-    console.log(`\u2705 trial completed:`);
-  } else if (ev.target.type === ActivityType.Survey) {
-    console.log(`\u2705 survey response completed:`);
+  const trials = ev.data;
+  if (trials && trials.length > 0) {
+    const correctCount = trials.filter((t) => t.selection_correct === true).length;
+    const accuracy = correctCount / trials.length * 100;
+    if (window.parent) {
+      window.parent.postMessage({
+        type: "LETTERGONOGO_ACCURACY",
+        // Custom message type for accuracy
+        value: accuracy.toFixed(2)
+        // Send as string like "85.00"
+      }, "*");
+    }
   }
-  console.log("  newData: " + JSON.stringify(ev.newData));
-  console.log("  newData schema: " + JSON.stringify(ev.newDataSchema));
-  console.log("  data: " + JSON.stringify(ev.data));
-  console.log("  data schema: " + JSON.stringify(ev.dataSchema));
-  console.log(
-    "  activity parameters: " + JSON.stringify(ev.activityConfiguration)
-  );
-  console.log(
-    "  activity parameters schema: " + JSON.stringify(ev.activityConfigurationSchema)
-  );
 });
 window.m2c2kitSession = session;
 session.initialize();
-//# sourceMappingURL=index.js.map
