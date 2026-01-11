@@ -16491,16 +16491,19 @@ const session = new Session({
   activities
 });
 session.onActivityData((ev) => {
-  const trials = ev.data;
-  if (trials && trials.length > 0) {
+  const dataObj = ev.data;
+  const trials = dataObj.trials;
+  const config = ev.activityConfiguration;
+  const totalTrialsNeeded = config.number_of_trials;
+  if (trials && trials.length == totalTrialsNeeded) {
     const correctCount = trials.filter((t) => t.selection_correct === true).length;
     const accuracy = correctCount / trials.length * 100;
+    console.log("\u2705 DEBUG: Calculated Accuracy:", accuracy);
     if (window.parent) {
+      console.log("\u{1F4E4} DEBUG: Posting message to Qualtrics...");
       window.parent.postMessage({
         type: "LETTERGONOGO_ACCURACY",
-        // Custom message type for accuracy
         value: accuracy.toFixed(2)
-        // Send as string like "85.00"
       }, "*");
     }
   }
