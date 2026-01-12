@@ -29,12 +29,12 @@ class LetterGoNoGo extends Game {
       },
       preparation_duration_ms: {
         type: "number",
-        default: 500,
+        default: 1000,
         description: "How long the 'Get Ready' message stays on screen (ms).",
       },
       selection_duration_ms: {
         type: "number",
-        default: 1500,
+        default: 2000,
         description: "How long the letter is shown, milliseconds.",
       },
       number_of_trials: {
@@ -206,7 +206,8 @@ impulses and maintain focus under time constraints.`,
       instructionScenes: [
         {
           title: "Letter Go-No Go",
-          text: `Press the circle with the letter inside if the letter is NOT X. Otherwise, ignore.`,
+          text: `If you are using a mobile device, tap on the blue circle with the letter inside with your finger if the letter is NOT X. Otherwise, do not tap.\n
+If you are using a computer device, click on the blue circle with the letter inside with your mouse if the letter is NOT X. Otherwise, do not click.`,
           textFontSize: 20,
           titleFontSize: 30,
           nextButtonText: "START",
@@ -432,14 +433,17 @@ session.onActivityData((ev) => {
   if (trials && trials.length == totalTrialsNeeded) {
     const correctCount = trials.filter((t: { selection_correct: boolean; }) => t.selection_correct === true).length;
     const accuracy = (correctCount / trials.length) * 100;
-
-    console.log("✅ DEBUG: Calculated Accuracy:", accuracy);
+    const simplifiedTrials = trials.map((t: any) => ({
+      success: t.selection_correct ? 1 : 0,  // Convert true/false to 1/0
+      rt: Math.round(t.response_time_ms),    // Round to nearest ms for cleanliness
+      letter: t.presented_letter_text
+    }));
 
     if (window.parent) {
-      console.log("📤 DEBUG: Posting message to Qualtrics...");
       window.parent.postMessage({
-          type: "LETTERGONOGO_ACCURACY",
-          value: accuracy.toFixed(2)
+          type: "LETTERGONOGO",
+          acc: accuracy.toFixed(2),
+          details: JSON.stringify(simplifiedTrials)
       }, "*");
     }
   }
