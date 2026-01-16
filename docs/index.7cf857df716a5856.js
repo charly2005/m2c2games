@@ -16338,7 +16338,7 @@ class LetterGoNoGo extends Game {
     ];
     const trialConfigurations = [];
     const totalTrials = game.getParameter("number_of_trials");
-    const noGoCount = Math.round(totalTrials * 0.2);
+    const noGoCount = Math.round(totalTrials * 0.8);
     const goCount = totalTrials - noGoCount;
     for (let i = 0; i < noGoCount; i++) {
       trialConfigurations.push({

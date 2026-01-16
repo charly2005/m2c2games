@@ -175,7 +175,7 @@ impulses and maintain focus under time constraints.`,
 
     const trialConfigurations: TrialConfiguration[] = [];
     const totalTrials = game.getParameter<number>("number_of_trials");
-    const noGoCount = Math.round(totalTrials * 0.2); 
+    const noGoCount = Math.round(totalTrials * 0.8); 
     const goCount = totalTrials - noGoCount;
 
     for (let i = 0; i < noGoCount; i++) {
