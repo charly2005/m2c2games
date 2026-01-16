@@ -16328,8 +16328,8 @@ class LetterGoNoGo extends Game {
   async initialize() {
     await super.initialize();
     const game = this;
-    const letters = [
-      { name: "X", isnogo: true },
+    const noGoLetter = { name: "X", isnogo: true };
+    const goLetters = [
       { name: "V", isnogo: false },
       { name: "Z", isnogo: false },
       { name: "Y", isnogo: false },
@@ -16337,13 +16337,25 @@ class LetterGoNoGo extends Game {
       { name: "W", isnogo: false }
     ];
     const trialConfigurations = [];
-    for (let i = 0; i < game.getParameter("number_of_trials"); i++) {
-      const randIdx = Math.floor(Math.random() * (letters.length + 2));
-      const letter = randIdx < letters.length ? letters[randIdx] : letters[0];
+    const totalTrials = game.getParameter("number_of_trials");
+    const noGoCount = Math.round(totalTrials * 0.2);
+    const goCount = totalTrials - noGoCount;
+    for (let i = 0; i < noGoCount; i++) {
       trialConfigurations.push({
-        presented_letter: letter.name,
-        presented_isnogo: letter.isnogo
+        presented_letter: noGoLetter.name,
+        presented_isnogo: noGoLetter.isnogo
       });
+    }
+    for (let i = 0; i < goCount; i++) {
+      const randomGoLetter = goLetters[Math.floor(Math.random() * goLetters.length)];
+      trialConfigurations.push({
+        presented_letter: randomGoLetter.name,
+        presented_isnogo: randomGoLetter.isnogo
+      });
+    }
+    for (let i = trialConfigurations.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [trialConfigurations[i], trialConfigurations[j]] = [trialConfigurations[j], trialConfigurations[i]];
     }
     const instructionsScenes = Instructions.create({
       instructionScenes: [
@@ -16513,6 +16525,7 @@ session.onActivityData((ev) => {
         acc: accuracy.toFixed(2),
         details: JSON.stringify(simplifiedTrials)
       }, "*");
+      console.log(accuracy);
     }
   }
 });

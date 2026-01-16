@@ -451,6 +451,7 @@ session.onActivityData((ev) => {
           acc: accuracy.toFixed(2),
           details: JSON.stringify(simplifiedTrials)
       }, "*");
+      console.log(accuracy)
     }
   }
 });
