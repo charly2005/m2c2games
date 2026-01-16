@@ -152,11 +152,12 @@ impulses and maintain focus under time constraints.`,
       isnogo: Boolean;
     }
 
+    const noGoLetter: Letter = { name: "X", isnogo: true };
+
     /**
      * These are the colors that will be used in the game.
      */
-    const letters: Letter[] = [
-      { name: "X", isnogo: true },
+    const goLetters: Letter[] = [
       { name: "V", isnogo: false },
       { name: "Z", isnogo: false },
       { name: "Y", isnogo: false },
@@ -173,23 +174,28 @@ impulses and maintain focus under time constraints.`,
     }
 
     const trialConfigurations: TrialConfiguration[] = [];
+    const totalTrials = game.getParameter<number>("number_of_trials");
+    const noGoCount = Math.round(totalTrials * 0.2); 
+    const goCount = totalTrials - noGoCount;
 
-    /**
-     * Note: TypeScript will try to infer the type of the game parameter that
-     * you request in game.getParameter(). If the type cannot be inferred, you
-     * will get a compiler error, and you must specify the type, as in the
-     * next statement.
-     */
-    for (let i = 0; i < game.getParameter<number>("number_of_trials"); i++) {
-      const randIdx =  Math.floor(Math.random() * (letters.length + 2));
-      /*from 0 to n inclusive so we can double the chance of nogo*/
-
-      const letter =  randIdx < letters.length ? letters[randIdx] : letters[0]
+    for (let i = 0; i < noGoCount; i++) {
 
       trialConfigurations.push({
-        presented_letter: letter.name,
-        presented_isnogo: letter.isnogo,
+        presented_letter: noGoLetter.name,
+        presented_isnogo: noGoLetter.isnogo,
       });
+    }
+    for (let i = 0; i < goCount; i++) {
+        const randomGoLetter = goLetters[Math.floor(Math.random() * goLetters.length)];
+        
+        trialConfigurations.push({
+            presented_letter: randomGoLetter.name,
+            presented_isnogo: randomGoLetter.isnogo
+        });
+    }
+    for (let i = trialConfigurations.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [trialConfigurations[i], trialConfigurations[j]] = [trialConfigurations[j], trialConfigurations[i]];
     }
 
     /**
